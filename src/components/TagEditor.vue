@@ -1,8 +1,8 @@
 <template>
   <div>
-    <b-input-group prepend="تگ" class="mt-3 tag-input">
+    <b-input-group :prepend="$t('shared.tags')" class="mt-3 tag-input">
       <b-form-input
-        placeholder="افزودن تگ"
+        :placeholder="$t('shared.tag')"
         class='tag-input-text'
         @keydown.enter='addTag(name)'
         @keydown.delete='removeLastTag'
@@ -16,19 +16,27 @@
         </span>
 
         <b-button variant="info" @click="addTag(name)">
-          {{ "افزودن" +  " +" }}
+          <font-awesome-icon
+            icon="plus"
+            class="align-middle"
+            :class="{'mr-1': $dir.ltr, 'ml-1': $dir.rtl}"
+          />
+          {{ $t('shared.add')}}
         </b-button>
       </b-input-group-append>
     </b-input-group>
 
-    <div class='tag-input-tags'>
-      <b-button @click="removeAll">
-        پاک کردن همه
+    <div class="tag-input-tags d-flex align-items-center py-3">
+      <b-button 
+        @click="removeAll" 
+        :class="{'mr-3': $dir.ltr, 'ml-3': $dir.rtl}" 
+      >
+        {{ $t('shared.remove')}}
       </b-button>
       
       <ul>
-        <li v-for='tag in tags' :key='tag'>
-          <tags :tag="tag" :editable="editable" @removeTag="removeTag"/>
+        <li v-for="tag in tags" :key="tag">
+          <tags :tag="tag" @removeTag="removeTag"/>
         </li>
       </ul>
 
@@ -40,7 +48,7 @@
 </template>
 
 <script>
-import Tags from '@/components/Tags'
+import Tags from '@/components/shared/Tags'
 
   export default {
     name: "TagEditor",
@@ -49,7 +57,6 @@ import Tags from '@/components/Tags'
     },
     data() {
       return {
-        editable: false,
         name: "",
         tags: [
           { 
@@ -72,7 +79,7 @@ import Tags from '@/components/Tags'
       }
     },
     methods: {
-      addTag(name) {
+      addTag (name) {
       if (this.tags.map((e) => e.name).includes(name)) {
         return;
       }
@@ -102,10 +109,7 @@ import Tags from '@/components/Tags'
 <style>
   .tag-input {
     border: 1px solid #D9DFE7;
-    background: #fff;
     border-radius: 4px;
-    box-sizing: border-box;
-    margin-bottom: 10px;
     width: 100%;
   }
 
@@ -115,6 +119,7 @@ import Tags from '@/components/Tags'
 
   .tag-input-tags ul {
     margin: 0!important;
+    padding-inline-start: 0!important
   }
 
   .tag-input-tags li input{
@@ -126,36 +131,24 @@ import Tags from '@/components/Tags'
   .tag-input-tags li {
     color: black;
     float: left;
-    margin-right: 10px;
-    background-color: lightgrey;
-    border-radius: 17px;
-    line-height: 24px;
-    padding: 4px 14px;
+    margin-right: 5px;
     list-style-type: none;
+    font-size: 18px;
+  }
+  .tag-input-tags .badge {
+    font-weight: 500!important;
+    cursor: pointer;
   }
 
   .tag-input-tags > span {
     cursor: pointer;
     opacity: 0.75;
-    margin-left: 8px;
-  }
-  .tag-input-tags {
-    display: flex;
-    align-items: center;
-    padding-top: 10px;
-    padding-bottom: 10px;
   }
 
-  .tag-input-tags button{
-    margin-right:5px
-  }
-    
   .tag-input-text {
     border: none;
-    outline: none;
-    line-height: 40px;
     background: none;
-    width: 79%;
+    width: 100%;
     padding-right: 8px;
   }
   .tag-input-tags button {
