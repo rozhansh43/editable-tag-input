@@ -1,94 +1,80 @@
 <template>
-  <div>
-    <b-form-group>
-      <b-input-group :prepend="prepend" class="item-input">
-        <b-input
-          :placeholder="placeholder"
-          rounded
-          class='position-relative'
-          maxlength="4" 
-          @keydown.enter='additem(newItem)'
-          @keydown.delete='removeLastitem'
-          v-model="newItem"
-        />
-          
-        <span class="d-flex align-items-center mx-2 position-absolute char-length">
-          4 / {{ newItem.length }} 
-        </span>
+  <b-form-group>
+    <b-input-group :prepend="prepend">
+      <b-input
+        :placeholder="$t('shared.maxChars', { max })"
+        class='position-relative'
+        :maxlength="maxChar" 
+        @keydown.enter='add'
+        v-model="keyword"
+      />
+        
+      <span class="d-flex align-items-center mx-2 position-absolute char-length">
+        {{ maxChar }} / {{ (keyword && keyword.length) || 0 }} 
+      </span>
 
-        <b-input-group-append>
-          <b-btn @click="additem(newItem)" variant="info">
+      <b-input-group-append>
+        <b-btn variant="info" @click="add">
+          <font-awesome-icon
+            icon="plus"
+            class="align-middle"
+            :class="{ 'mr-1': $dir.ltr, 'ml-1': $dir.rtl }"
+          />
+
+          {{ $t('shared.add') }}
+        </b-btn>
+      </b-input-group-append>
+    </b-input-group>
+
+    <b-row v-if="model && model.length">
+      <b-col
+        v-for="item in model"
+        :key="item"
+        cols="auto"
+        class="mt-3"
+      >
+        <div class="py-1 px-3 bg-warning text-dark rounded-pill d-flex align-items-center">
+          {{ item }}
+
+          <b-btn variant="link" class="inherited-link p-0" @click="remove(item)">
             <font-awesome-icon
-              icon="plus"
+              icon="times"
               class="align-middle"
-              :class="{'mr-1': $dir.ltr, 'ml-1': $dir.rtl}"
+              :class="{ 'ml-2': $dir.ltr, 'mr-2': $dir.rtl }"
             />
-              {{ $t('shared.add')}}
           </b-btn>
-        </b-input-group-append>
-      </b-input-group>
-    </b-form-group>
-
-    <div class="d-flex align-items-center">    
-      <ul class="p-0 list-unstyled"> 
-        <li 
-          v-for="item in model" 
-          :key="item.id" 
-          :class="{'mr-3': $dir.ltr, 'ml-3': $dir.rtl}"
-          class="text-dark float-left"
-        >
-          <b-badge 
-            pill 
-            variant="warning" 
-            class="p-2 d-flex align-items-center"
-          >
-            <span>
-              {{ item }}
-            </span>
-            
-            <span @click="removeitem(item)">
-              <font-awesome-icon
-                icon="times"
-                class="align-middle"
-                :class="{'ml-3': $dir.ltr, 'mr-3': $dir.rtl}"
-              />
-            </span>
-           </b-badge>
-        </li>
-      </ul>
-    </div>
-  </div>
+        </div>
+      </b-col>
+    </b-row>
+  </b-form-group>
 </template>
 
 <script>
   export default {
-    name: 'TagEditor',
+    name: 'MyTagEditor',
     props: {
-      value: { type: Array },
-      prepend: { type: String },
-      placeholder: { type: String }
+      value: Array,
+      prepend: String,
+      max: Number,
+      maxChar: Number
     },
-    data() {
+    data () {
       return {
-        newItem: "",
+        keyword: null,
       }
     },
     methods: {
-      additem (newItem) {
-        if (this.newItem && !this.model.find(o => o === this.newItem)) {
-          if (this.model.length < 6 && newItem.length > 1 ) {
-            this.model.push(newItem)
-            this.newItem = ""
-          }
-        }
+      add () {
+        if (!this.keyword || (this.model && this.model.length && this.model.find(o => o === this.keyword)))
+          return this.keyword = null
+        else if (this.model && this.model.length && this.model.length >=6)
+          return
+
+        this.model.push(this.keyword)
+        this.keyword = null
       },
-      removeitem (item) {
+      remove (item) {
         this.model = this.model.filter(o => o !== item)
-      },
-      removeLastitem () {
-        if ( this.newItem == 0 ) {
-          this.model.pop()
-        }
       }
     },
     computed: {
@@ -104,9 +90,6 @@
   }
 </script>
 <style scoped>
-.badge {
-  font-size: 12px;
-}
   .char-length {
     right: 78%;
     top: 30%;
